@@ -1,0 +1,28 @@
+#!/bin/python
+import serial
+
+#navázání komunikace (když se spustí conn)
+conn = serial.Serial("/dev/ttyACM0", 9600, timeout=1)
+
+while True:
+    INPUT = input()
+    if INPUT == "exit":
+        conn.close() #může selhat!!!
+        #sanity check
+        if conn.is_open:
+            print("je to pořád připojený!!!!!.")
+        else:
+            break
+
+    if INPUT == "":
+        continue #přeskočí to kód dole
+
+    conn.write((INPUT + "\n").encode())
+
+    OUTPUT = ""
+    while True:
+        OUTPUT += conn.read(conn.in_waiting).decode()
+        if OUTPUT.endswith("ok\n"):
+            break
+
+    print(OUTPUT, end="") #end="" smaže zbytečné \n
