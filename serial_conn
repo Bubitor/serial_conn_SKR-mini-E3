@@ -1,4 +1,5 @@
 #!/bin/python
+import os
 import sys
 import serial
 
@@ -6,11 +7,17 @@ import serial
 conn = serial.Serial("/dev/ttyACM0", 9600, timeout=1)
 
 while True:
-    if len(sys.argv) > 1:
-        for arg in sys.argv[1:]:
-            INPUT = arg #argumentové zadání (provede a ukončí)
-            conn.write((INPUT + "\n").encode())
-            INPUT = "exit"
+    if len(sys.argv) > 1: #bez arg se argv == 1, tj. jméno souboru
+        for arg in sys.argv[1:]: #['jmeno_souboru', 'arg1', ...]
+            if os.path.isfile(arg): #souborové zadání (provede a ukončí)
+                with open(arg, "r", encoding="utf-8") as soubor:
+                    for line in soubor:
+                        #conn.write((line.strip() + "\n").encode()) #strip() odebere přebytečné \n
+                        conn.write((line).encode())
+                    INPUT = "exit"
+            else:
+                conn.write((arg + "\n").encode()) #argumentové zadání (provede a ukončí)
+                INPUT = "exit"
     else:
         INPUT = input() #manuální zadání
 
