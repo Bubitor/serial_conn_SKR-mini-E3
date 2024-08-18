@@ -1,11 +1,19 @@
 #!/bin/python
+import sys
 import serial
 
 #navázání komunikace (když se spustí conn)
 conn = serial.Serial("/dev/ttyACM0", 9600, timeout=1)
 
 while True:
-    INPUT = input()
+    if len(sys.argv) > 1:
+        for arg in sys.argv[1:]:
+            INPUT = arg #argumentové zadání (provede a ukončí)
+            conn.write((INPUT + "\n").encode())
+            INPUT = "exit"
+    else:
+        INPUT = input() #manuální zadání
+
     if INPUT == "exit":
         conn.close() #může selhat!!!
         #sanity check
