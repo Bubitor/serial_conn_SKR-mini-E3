@@ -1,7 +1,9 @@
 #!/bin/python
 import os
 import sys
+import time
 import serial
+from inputs import get_gamepad
 
 #navázání komunikace (když se spustí conn)
 conn = serial.Serial("/dev/ttyACM0", 9600, timeout=1)
@@ -15,6 +17,31 @@ while True:
                         #conn.write((line.strip() + "\n").encode()) #strip() odebere přebytečné \n
                         conn.write((line).encode())
                     INPUT = "exit"
+            elif arg == "gamepad": #gamepad zadání: M17 a z gamepad
+                S = 0
+                conn.write(("M17\n").encode())
+                while True:
+                    for INPUT in get_gamepad():
+                        if INPUT.ev_type == "Absolute" and INPUT.code == "ABS_HAT0X":
+                            if INPUT.state != 0:
+                                ROTACE = INPUT.state
+                                START_TIME = time.time()
+                                time.sleep(0.2)
+                            else:
+                                PRESS_TIME = int(time.time() - START_TIME)
+                                if ROTACE == 1:
+                                    S += PRESS_TIME*20
+                                if ROTACE == -1:
+                                    S -= PRESS_TIME*20
+                                INPUT = f"G1 F500 Y{S}"
+                                print(INPUT)
+                                conn.write((INPUT + "\n").encode())
+                                OUTPUT = ""
+                                while True:
+                                    OUTPUT += conn.read(conn.in_waiting).decode()
+                                    if OUTPUT.endswith("ok\n"):
+                                        break
+                                print(OUTPUT, end="") #end="" smaže zbytečné \n
             else:
                 conn.write((arg + "\n").encode()) #argumentové zadání (provede a ukončí)
                 INPUT = "exit"
