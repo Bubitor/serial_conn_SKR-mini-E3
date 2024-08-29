@@ -18,7 +18,8 @@ while True:
                         conn.write((line).encode())
                     INPUT = "exit"
             elif arg == "gamepad": #gamepad zadání: M17 a z gamepad
-                S = 0
+                X = 0
+                Y = 0
                 conn.write(("M17\n").encode())
                 while True:
                     for INPUT in get_gamepad():
@@ -29,17 +30,25 @@ while True:
                                 print("je to pořád připojený!!!!!.")
                             else:
                                 sys.exit()
-                        if INPUT.ev_type == "Absolute" and INPUT.code == "ABS_HAT0X":
+                        if INPUT.ev_type == "Absolute" and INPUT.code == "ABS_HAT0X" or INPUT.code == "ABS_HAT0Y":
                             if INPUT.state != 0:
+                                TLACITKO = INPUT.code
                                 ROTACE = INPUT.state
                                 START_TIME = time.time()
                             else:
-                                PRESS_TIME = int(time.time() - START_TIME)
-                                if ROTACE == 1:
-                                    S += int(PRESS_TIME*20)
-                                if ROTACE == -1:
-                                    S -= int(PRESS_TIME*20)
-                                INPUT = f"G1 F500 X{S}"
+                                PRESS_TIME = time.time() - START_TIME
+                                if TLACITKO == "ABS_HAT0X":
+                                    if ROTACE == 1:
+                                        X += int(PRESS_TIME*20)
+                                    if ROTACE == -1:
+                                        X -= int(PRESS_TIME*20)
+                                    INPUT = f"G1 F500 X{X}"
+                                if TLACITKO == "ABS_HAT0Y":
+                                    if ROTACE == 1:
+                                        Y += int(PRESS_TIME*20)
+                                    if ROTACE == -1:
+                                        Y -= int(PRESS_TIME*20)
+                                    INPUT = f"G1 F1000 Y{Y}"
                                 print(INPUT)
                                 conn.write((INPUT + "\n").encode())
                                 OUTPUT = ""
