@@ -23,7 +23,7 @@ while True:
                 while True:
                     for INPUT in get_gamepad():
                         if INPUT.ev_type == "Key" and INPUT.code == "BTN_NORTH" and INPUT.state == 0:
-                            conn.close() #může selhat!!!
+                            conn.close()
                             if conn.is_open:
                                 print("je to pořád připojený!!!!!.")
                             else:
@@ -32,14 +32,13 @@ while True:
                             if INPUT.state != 0:
                                 ROTACE = INPUT.state
                                 START_TIME = time.time()
-                                time.sleep(0.2)
                             else:
                                 PRESS_TIME = int(time.time() - START_TIME)
                                 if ROTACE == 1:
-                                    S += PRESS_TIME*20
+                                    S += int(PRESS_TIME*20)
                                 if ROTACE == -1:
-                                    S -= PRESS_TIME*20
-                                INPUT = f"G1 F500 Y{S}"
+                                    S -= int(PRESS_TIME*20)
+                                INPUT = f"G1 F500 X{S}"
                                 print(INPUT)
                                 conn.write((INPUT + "\n").encode())
                                 OUTPUT = ""
