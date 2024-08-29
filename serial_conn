@@ -23,6 +23,7 @@ while True:
                 while True:
                     for INPUT in get_gamepad():
                         if INPUT.ev_type == "Key" and INPUT.code == "BTN_NORTH" and INPUT.state == 0:
+                            conn.write(("M18\n").encode())
                             conn.close()
                             if conn.is_open:
                                 print("je to pořád připojený!!!!!.")
