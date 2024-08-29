@@ -22,6 +22,12 @@ while True:
                 conn.write(("M17\n").encode())
                 while True:
                     for INPUT in get_gamepad():
+                        if INPUT.ev_type == "Key" and INPUT.code == "BTN_NORTH" and INPUT.state == 0:
+                            conn.close() #může selhat!!!
+                            if conn.is_open:
+                                print("je to pořád připojený!!!!!.")
+                            else:
+                                sys.exit()
                         if INPUT.ev_type == "Absolute" and INPUT.code == "ABS_HAT0X":
                             if INPUT.state != 0:
                                 ROTACE = INPUT.state
